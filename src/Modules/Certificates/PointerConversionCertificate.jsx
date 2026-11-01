@@ -60,6 +60,36 @@ const filenameFrom = (header, fallback) => {
   return match?.[1] || fallback;
 };
 
+// Laid out as the PDF: Carlito, the metric match for the Calibri the
+// Academic format uses, with the points and details 1.3 cm in.
+const PAGE = { fontFamily: '"Carlito", sans-serif', padding: "35mm 20mm 20mm" };
+const HEADING = { fontFamily: "inherit", fontSize: "12pt" };
+const BODY = {
+  fontSize: "12pt",
+  lineHeight: "24pt",
+  textAlign: "justify",
+  margin: 0,
+};
+const INDENT = { marginLeft: "1.3cm" };
+const POINTS = {
+  ...BODY,
+  paddingLeft: "1.3cm",
+  marginTop: "0.2cm",
+};
+const DETAILS = {
+  ...INDENT,
+  marginTop: "0.2cm",
+  borderCollapse: "collapse",
+  fontSize: "12pt",
+  lineHeight: "24pt",
+};
+const SIGNATURE = {
+  marginTop: "2.2cm",
+  marginLeft: "0.6cm",
+  fontSize: "11pt",
+  fontWeight: 700,
+};
+
 export default function PointerConversionCertificate() {
   const [rollNumber, setRollNumber] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -284,146 +314,59 @@ export default function PointerConversionCertificate() {
         <Grid.Col span={{ base: 12, xl: 8 }}>
           {preview ? (
             <div className={classes.previewViewport}>
-              <article className={classes.certificate}>
+              <article className={classes.certificate} style={PAGE}>
                 <header className={classes.certificateHeader}>
                   <div>
                     <div>{preview.meta.signatory_name}</div>
                     <div>{preview.meta.signatory_title}</div>
                   </div>
-                  <div className={classes.reference}>
+                  <div style={{ textAlign: "left", justifySelf: "end" }}>
                     <div>{preview.meta.reference_preview}</div>
                     <div>Date – {preview.meta.issued_on}</div>
                   </div>
                 </header>
-                <h2 className={classes.heading}>
+                <h2 className={classes.heading} style={HEADING}>
                   TO WHOM SO EVER IT MAY CONCERN
                 </h2>
-                <p className={classes.body}>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This is to certify that:
+                <p style={{ ...BODY, marginLeft: "0.6cm" }}>
+                  This is to certify that:
                 </p>
-                <p className={classes.body} style={{ marginTop: "14pt" }}>
-                  1. The graduation requirement for {preview.student.programme}{" "}
-                  ({preview.student.programme_abbr}) programme at PDPM-IIITDM
-                  Jabalpur is a minimum CPI of {preview.minCpi} out of the
-                  maximum of 10.0.
+                <ol style={POINTS}>
+                  <li>
+                    The graduation requirement for{" "}
+                    <strong>{preview.student.programme}</strong> (
+                    {preview.student.programme_abbr}) programme at PDPM-IIITDM
+                    Jabalpur is a minimum CPI of {preview.minCpi} out of the
+                    maximum of 10.0.
+                  </li>
+                  <li>
+                    Notionally, the CPI may be multiplied by a factor of 10 to
+                    obtain the numerical percentage.
+                  </li>
+                </ol>
+                <p style={{ ...BODY, ...INDENT, marginTop: "1.2cm" }}>
+                  <strong>Issued to :</strong>
                 </p>
-                <p className={classes.body} style={{ marginTop: "12pt" }}>
-                  2. Notionally, the CPI may be multiplied by a factor of 10 to
-                  obtain the numerical percentage.
-                </p>
-                <p
-                  className={classes.body}
-                  style={{ marginTop: "24pt", fontWeight: 700 }}
-                >
-                  Issued to :
-                </p>
-                <table
-                  style={{
-                    marginTop: "12pt",
-                    borderCollapse: "collapse",
-                    fontSize: "12pt",
-                    lineHeight: "22pt",
-                  }}
-                >
+                <table style={DETAILS}>
                   <tbody>
-                    <tr>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "16pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        Name
-                      </td>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "12pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        :
-                      </td>
-                      <td style={{ verticalAlign: "top" }}>
-                        {preview.student.salutation} {preview.student.name}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "16pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        Roll No.
-                      </td>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "12pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        :
-                      </td>
-                      <td style={{ verticalAlign: "top" }}>
-                        {preview.student.roll_number}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "16pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        Branch
-                      </td>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "12pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        :
-                      </td>
-                      <td style={{ verticalAlign: "top" }}>
-                        {preview.student.discipline}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "16pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        CPI
-                      </td>
-                      <td
-                        style={{
-                          fontWeight: 700,
-                          paddingRight: "12pt",
-                          verticalAlign: "top",
-                        }}
-                      >
-                        :
-                      </td>
-                      <td style={{ verticalAlign: "top" }}>
-                        {preview.cpiText}
-                      </td>
-                    </tr>
+                    {[
+                      [
+                        "Name",
+                        `${preview.student.salutation} ${preview.student.name}`,
+                      ],
+                      ["Roll No.", preview.student.roll_number],
+                      ["Branch", preview.student.discipline],
+                      ["CPI", preview.cpiText],
+                    ].map(([label, value]) => (
+                      <tr key={label}>
+                        <td style={{ width: "2.2cm" }}>{label}</td>
+                        <td style={{ width: "0.5cm" }}>:</td>
+                        <td>{value}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
-                <div className={classes.signature}>
-                  <div>{preview.meta.signatory_name}</div>
-                  <div>{preview.meta.signatory_title}</div>
-                </div>
+                <div style={SIGNATURE}>{preview.meta.signatory_name}</div>
               </article>
             </div>
           ) : (
