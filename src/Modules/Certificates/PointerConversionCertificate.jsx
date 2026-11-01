@@ -55,6 +55,10 @@ const responseMessage = async (error) => {
   );
 };
 
+// The server accepts the same: a number from 0 to 10, at most two decimals.
+const CPI_PATTERN = /^(10(\.0{1,2})?|\d(\.\d{1,2})?)$/;
+const isValidCpi = (value) => CPI_PATTERN.test(value.trim());
+
 const filenameFrom = (header, fallback) => {
   const match = header?.match(/filename="?([^";]+)"?/i);
   return match?.[1] || fallback;
@@ -123,8 +127,8 @@ export default function PointerConversionCertificate() {
     setPreview({
       student: selectedStudent,
       meta: certificateMeta,
-      cpiText: cpiText.trim() || selectedStudent.cpi_display || "……………",
-      minCpi: minCpi.trim() || "5.0",
+      cpiText: cpiText.trim(),
+      minCpi: minCpi.trim(),
     });
   };
 
@@ -136,8 +140,8 @@ export default function PointerConversionCertificate() {
         pointerConversionPdfRoute,
         {
           student_id: selectedStudent.student_id,
-          cpi_text: cpiText.trim() || selectedStudent.cpi_display || "……………",
-          min_cpi: minCpi.trim() || "5.0",
+          cpi_text: cpiText.trim(),
+          min_cpi: minCpi.trim(),
         },
         { ...authConfig(), responseType: "blob" },
       );
@@ -162,7 +166,12 @@ export default function PointerConversionCertificate() {
     }
   };
 
-  const ready = Boolean(selectedStudent?.is_ready);
+  const calculatedCpi = selectedStudent?.cpi_display || "";
+  const cpiValid = isValidCpi(cpiText);
+  const minCpiValid = isValidCpi(minCpi);
+  const cpiChanged =
+    cpiValid && calculatedCpi && Number(cpiText) !== Number(calculatedCpi);
+  const ready = Boolean(selectedStudent?.is_ready) && cpiValid && minCpiValid;
 
   return (
     <>
@@ -239,11 +248,16 @@ export default function PointerConversionCertificate() {
                 <>
                   <TextInput
                     label="CPI"
-                    placeholder="e.g. 7.3 or 7.3 (Till VI Sem)"
+                    placeholder="e.g. 7.3"
                     description={
-                      selectedStudent.cpi > 0
-                        ? "Automatically calculated from course grades."
-                        : "No grades found in records. Enter CPI manually, or leave blank to display dots."
+                      calculatedCpi
+                        ? `Calculated from declared results: ${calculatedCpi}.`
+                        : "No declared result yet. Enter the CPI."
+                    }
+                    error={
+                      cpiText.trim() && !cpiValid
+                        ? "Enter a number from 0 to 10, at most two decimals."
+                        : null
                     }
                     value={cpiText}
                     onChange={(event) => {
@@ -254,12 +268,23 @@ export default function PointerConversionCertificate() {
                   <TextInput
                     label="Minimum CPI required for graduation"
                     placeholder="e.g. 5.0"
+                    error={
+                      minCpi.trim() && !minCpiValid
+                        ? "Enter a number from 0 to 10, at most two decimals."
+                        : null
+                    }
                     value={minCpi}
                     onChange={(event) => {
                       setMinCpi(event.currentTarget.value);
                       setPreview(null);
                     }}
                   />
+                  {cpiChanged && (
+                    <Alert color="yellow" icon={<Warning size={18} />}>
+                      The CPI entered differs from the calculated CPI (
+                      {calculatedCpi}). It will be printed as entered.
+                    </Alert>
+                  )}
                 </>
               )}
 
