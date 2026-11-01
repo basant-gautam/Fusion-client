@@ -60,34 +60,16 @@ const filenameFrom = (header, fallback) => {
   return match?.[1] || fallback;
 };
 
-// Laid out as the PDF: Carlito, the metric match for the Calibri the
-// Academic format uses, with the points and details 1.3 cm in.
-const PAGE = { fontFamily: '"Carlito", sans-serif', padding: "35mm 20mm 20mm" };
-const HEADING = { fontFamily: "inherit", fontSize: "12pt" };
-const BODY = {
-  fontSize: "12pt",
-  lineHeight: "24pt",
-  textAlign: "justify",
-  margin: 0,
-};
-const INDENT = { marginLeft: "1.3cm" };
-const POINTS = {
-  ...BODY,
-  paddingLeft: "1.3cm",
-  marginTop: "0.2cm",
-};
+// Laid out as the PDF, in the bonafide's type and spacing; only the list
+// and details are indented.
+const INDENT = { marginLeft: "0.7cm" };
+const POINTS = { paddingLeft: "0.7cm", marginTop: "0.2cm", marginBottom: 0 };
 const DETAILS = {
   ...INDENT,
   marginTop: "0.2cm",
   borderCollapse: "collapse",
   fontSize: "12pt",
-  lineHeight: "24pt",
-};
-const SIGNATURE = {
-  marginTop: "2.2cm",
-  marginLeft: "0.6cm",
-  fontSize: "11pt",
-  fontWeight: 700,
+  lineHeight: 1.42,
 };
 
 export default function PointerConversionCertificate() {
@@ -314,7 +296,7 @@ export default function PointerConversionCertificate() {
         <Grid.Col span={{ base: 12, xl: 8 }}>
           {preview ? (
             <div className={classes.previewViewport}>
-              <article className={classes.certificate} style={PAGE}>
+              <article className={classes.certificate}>
                 <header className={classes.certificateHeader}>
                   <div>
                     <div>{preview.meta.signatory_name}</div>
@@ -325,13 +307,11 @@ export default function PointerConversionCertificate() {
                     <div>Date – {preview.meta.issued_on}</div>
                   </div>
                 </header>
-                <h2 className={classes.heading} style={HEADING}>
+                <h2 className={classes.heading}>
                   TO WHOM SO EVER IT MAY CONCERN
                 </h2>
-                <p style={{ ...BODY, marginLeft: "0.6cm" }}>
-                  This is to certify that:
-                </p>
-                <ol style={POINTS}>
+                <p className={classes.body}>This is to certify that:</p>
+                <ol className={classes.body} style={POINTS}>
                   <li>
                     The graduation requirement for{" "}
                     <strong>{preview.student.programme}</strong> (
@@ -344,7 +324,10 @@ export default function PointerConversionCertificate() {
                     obtain the numerical percentage.
                   </li>
                 </ol>
-                <p style={{ ...BODY, ...INDENT, marginTop: "1.2cm" }}>
+                <p
+                  className={classes.body}
+                  style={{ ...INDENT, marginTop: "0.9cm" }}
+                >
                   <strong>Issued to :</strong>
                 </p>
                 <table style={DETAILS}>
@@ -366,7 +349,9 @@ export default function PointerConversionCertificate() {
                     ))}
                   </tbody>
                 </table>
-                <div style={SIGNATURE}>{preview.meta.signatory_name}</div>
+                <div className={classes.signature}>
+                  {preview.meta.signatory_name}
+                </div>
               </article>
             </div>
           ) : (
