@@ -38,6 +38,15 @@ export const CERTIFICATE_PAGES = [
     desktopOnly: true,
   },
   {
+    key: "mediumOfInstructionCertificate",
+    slug: "medium-of-instruction",
+    title: "Medium of Instruction",
+    icon: "Scroll",
+    group: "Certificates",
+    roles: ["acadadmin"],
+    desktopOnly: true,
+  },
+  {
     key: "pointerConversionCertificate",
     slug: "pointer-conversion-certificate",
     title: "Pointer Conversion Certificate",
